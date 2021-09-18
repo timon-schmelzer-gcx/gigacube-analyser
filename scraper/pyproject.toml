@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "gigacube"
+version = "0.1.0"
+description = ""
+authors = ["Timon Schmelzer <timon.schmelzer@grandcentrix.net>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+ipython = "^7.27.0"
+Scrapy = "^2.5.0"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

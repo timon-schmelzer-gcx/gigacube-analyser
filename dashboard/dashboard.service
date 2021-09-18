@@ -1,0 +1,11 @@
+[Unit]
+Description=Streamlit Dashboard Service
+After=multi-user.target
+
+[Service]
+Type=simple
+Restart=always
+ExecStart=/home/timon/.cache/pypoetry/virtualenvs/dashboard-h-n0z5ZH-py3.9/bin/streamlit run /home/timon/Code/dashboard/src/app.py
+
+[Install]
+WantedBy=multi-user.target
