@@ -131,6 +131,13 @@ live in Germany, so I switched the timezone in the following way:
 sudo timedatectl set-timezone Europe/Berlin
 ```
 
+If you do not like the hostname _ubuntu_, you can change it by editing
+/etc/hostname (`sudo vi /etc/hostname`). Do not forget to reboot afterwards!
+
+Furthermore, if you do not like to type ip addresses in your browser, you
+can install and configure the _avahi-daemon_ to access the
+dashboard like follows: `ubuntu.local:8501`.
+
 ### Automate services
 This is the most tricky part in my opinion. Of course we could run the applications via
 SSH terminals and everything will run fine. We could also use a terminal multiplexer
