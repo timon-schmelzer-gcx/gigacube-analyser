@@ -2,7 +2,7 @@
 .DEFAULT_GOAL := fetch
 
 fetch:
-	scrapy crawl volume -o data/volumes.jl
+	scrapy crawl volume
 
 help:
 	cat Makefile
