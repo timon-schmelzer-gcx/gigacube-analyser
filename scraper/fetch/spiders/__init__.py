@@ -1,8 +1,13 @@
+import sys
 from datetime import datetime
 from typing import Tuple
 
 import scrapy
 
+sys.path.append('..')
+
+from communicate.dbutils import create_connection
+from communicate.dbutils import insert_data
 
 class VolumeSpider(scrapy.Spider):
     name = 'volume'
@@ -32,8 +37,8 @@ class VolumeSpider(scrapy.Spider):
         if len(start.split('.')[-1]) != 4:
             start = start + end.split('.')[-1]
 
-        start = datetime.strptime(start, r'%d.%m.%Y')
-        end = datetime.strptime(end, r'%d.%m.%Y')
+        start = datetime.strptime(start, '%d.%m.%Y')
+        end = datetime.strptime(end, '%d.%m.%Y')
 
         return start, end
 
@@ -44,10 +49,17 @@ class VolumeSpider(scrapy.Spider):
         total = VolumeSpider.format_volume(total)
         start_date, end_date = VolumeSpider.format_dates(dates)
 
-        yield {
+        data_obj = {
             'current_volume': current,
             'total_volume': total,
-            'start_date': start_date,
-            'end_date': end_date,
-            'timestamp': datetime.now()
+            'start_date': start_date.strftime('%Y-%m-%d'),
+            'end_date': end_date.strftime('%Y-%m-%d'),
+            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         }
+
+        with create_connection() as con:
+            insert_data(con, data_obj)
+
+        print(f'Ingested the following data object into database:\n{data_obj}')
+
+        yield data_obj

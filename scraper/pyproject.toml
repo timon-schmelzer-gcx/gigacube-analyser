@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "gigacube"
+name = "scraper"
 version = "0.1.0"
 description = ""
 authors = ["Timon Schmelzer <timon.schmelzer@grandcentrix.net>"]
@@ -8,6 +8,8 @@ authors = ["Timon Schmelzer <timon.schmelzer@grandcentrix.net>"]
 python = "^3.9"
 ipython = "^7.27.0"
 Scrapy = "^2.5.0"
+psycopg2 = "^2.9.1"
+python-dotenv = "^0.19.1"
 
 [tool.poetry.dev-dependencies]
 
