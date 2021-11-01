@@ -3,8 +3,11 @@ import os
 import numpy as np
 import pandas as pd
 import plotly.express as px
+import plotly.graph_objects as go
 import streamlit as st
+from dotenv import load_dotenv
 
+load_dotenv()
 # st.set_page_config(layout='wide')
 
 df = pd.read_json(os.getenv('DATAPATH'),
@@ -29,6 +32,57 @@ current_duration = (df.loc[len(df)-1]['timestamp'] - start_date).total_seconds()
 
 estimated_volume = round((current_volume / current_duration) * total_duration, 2)
 
+###
+freq = st.selectbox('Select Frequency', ['15min', '30min', '1H'])
+agg = st.selectbox('Select Aggregation', ['mean', 'median', 'max', 'sum'])
+def interpolate(df: pd.DataFrame, freq: str = freq) -> pd.Series:
+    '''Calculates current volumes at given frequencies `freq`.'''
+    df = df.copy().set_index('timestamp')
+    start_ts = pd.Timestamp(df.index[0]).ceil(freq=freq)
+    stop_ts = pd.Timestamp(df.index[-1]).ceil(freq=freq)
+    anchor_tss = pd.date_range(start_ts, stop_ts, freq=freq)
+
+    for anchor_ts in anchor_tss:
+        df.loc[anchor_ts] = [None]*len(df.columns)
+
+    ser_inter = pd.Series(data=df['current_volume'].interpolate(method='time'),
+                           index=anchor_tss)
+
+    return ser_inter
+
+ser_inter = interpolate(df)
+
+def plot_histogram(consumptions: pd.Series,
+                   agg: str = 'mean') -> go.Figure:
+    '''Plots a histogram of consumptions at given timestamps (index).'''
+    df_hist = pd.DataFrame({
+        'consumptions': consumptions,
+        'deltas': consumptions.diff(1).shift(-1)})
+    df_hist.dropna()
+    df_hist['hour'] = df_hist.index.hour
+    df_hist['minute'] = df_hist.index.minute
+
+    df_hist['interval'] = (
+        df_hist['hour'].apply(lambda val: f'{val:02}') +
+        ':' +
+        df_hist['minute'].apply(lambda val: f'{val:02}')
+    )
+
+    df_group = df_hist.groupby('interval').agg(
+        deltas_agg=pd.NamedAgg('deltas', agg)
+    )
+
+    fig = px.histogram(df_group, x=df_group.index, y=df_group['deltas_agg'])
+    fig.update_layout(
+        yaxis_title=f'{agg.capitalize()} traffic in {freq} [GB]',
+        xaxis_title='Time Interval'
+    )
+    st.plotly_chart(fig)
+
+plot_histogram(ser_inter, agg)
+
+###
+
 col_one, col_two, col_three = st.columns((1, 1, 1))
 with col_one:
     st.metric('Current Volume',
@@ -47,8 +101,6 @@ with col_three:
               f'{total_volume}GB',
               f'{(estimated_volume - total_volume) / total_volume:.2%}',
               delta_color='inverse')
-
-
 
 df = df.rename({
     'current_volume': 'Current',

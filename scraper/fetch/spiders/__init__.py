@@ -60,6 +60,4 @@ class VolumeSpider(scrapy.Spider):
         with create_connection() as con:
             insert_data(con, data_obj)
 
-        print(f'Ingested the following data object into database:\n{data_obj}')
-
         yield data_obj

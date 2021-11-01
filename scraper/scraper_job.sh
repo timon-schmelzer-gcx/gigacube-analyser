@@ -1,0 +1,1 @@
+* * * * * timon cd /home/timon/Code/gigacube-analyser/scraper && /home/timon/.cache/pypoetry/virtualenvs/scraper-omaoyfXU-py3.9/bin/scrapy crawl volume -o /home/timon/Code/scraper/data/volumes_v2.jl > /dev/null 2>&1
